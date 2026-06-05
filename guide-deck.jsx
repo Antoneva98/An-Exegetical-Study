@@ -272,6 +272,29 @@ function GuideDeck({ slides, startIndex = 0, onClose }) {
     requestAnimationFrame(place);
   }, []); // eslint-disable-line
 
+  // Wheel: плавна навігація колесом миші з урахуванням внутрішнього скролу панелі
+  useEffect(() => {
+    const c = scrollerRef.current;
+    if (!c) return;
+    let wheelLock = false;
+    const onWheel = (e) => {
+      // Якщо внутрішній контент панелі скролиться — не перехоплюємо
+      const inner = e.target.closest(".gp-inner");
+      if (inner) {
+        const atTop = inner.scrollTop <= 1;
+        const atBottom = inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 1;
+        if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) return;
+      }
+      e.preventDefault();
+      if (wheelLock) return;
+      wheelLock = true;
+      go(e.deltaY > 0 ? 1 : -1);
+      setTimeout(() => { wheelLock = false; }, 600);
+    };
+    c.addEventListener("wheel", onWheel, { passive: false });
+    return () => c.removeEventListener("wheel", onWheel);
+  }, [go]);
+
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") onClose();
