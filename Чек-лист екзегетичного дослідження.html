@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Чек-лист екзегетичного дослідження</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Onest:wght@400;500;600;700;800&family=Commissioner:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  .root {
+    --r: 16px;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* ── Аркуш ───────────────────────────────────────────── */
+  .sheet {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: clamp(28px, 7vw, 56px) clamp(18px, 5vw, 44px) 64px;
+  }
+
+  /* ── Шапка ────────────────────────────────────────────── */
+  .eyebrow {
+    font-size: calc(12px * var(--scale));
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+  }
+  .title {
+    font-size: calc(clamp(30px, 8.5vw, 46px) * var(--scale));
+    line-height: 1.06;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+  .lede {
+    font-size: calc(15px * var(--scale));
+    line-height: 1.55;
+    color: var(--muted);
+    margin: 0;
+    max-width: 46ch;
+  }
+
+  /* ── Прогрес ──────────────────────────────────────────── */
+  .progress { margin-top: 28px; }
+  .progress-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .progress-count {
+    font-size: calc(13px * var(--scale));
+    color: var(--muted);
+    letter-spacing: 0.01em;
+  }
+  .progress-count b {
+    color: var(--ink);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .reset {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--accent);
+    font: inherit;
+    font-size: calc(12.5px * var(--scale));
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .reset:hover { opacity: 0.7; }
+  .progress-track {
+    height: 5px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--accent);
+    transition: width 0.35s cubic-bezier(0.3, 0.7, 0.4, 1);
+  }
+
+  /* ── Список кроків ────────────────────────────────────── */
+  .steps {
+    margin-top: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: clamp(16px, 4vw, 22px);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .step.done { border-color: color-mix(in oklab, var(--accent) 30%, var(--line)); }
+
+  .step-main {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .step-body { flex: 1; min-width: 0; padding-top: 1px; }
+
+  .step-n {
+    font-size: calc(13px * var(--scale));
+    font-weight: 600;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    margin-right: 10px;
+  }
+  .step-title {
+    font-size: calc(clamp(19px, 5vw, 23px) * var(--scale));
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: pretty;
+  }
+  .step-sup {
+    display: inline-block;
+    margin-left: 10px;
+    vertical-align: middle;
+    font-size: calc(11px * var(--scale));
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--accent-soft);
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .step-desc {
+    font-size: calc(14.5px * var(--scale));
+    line-height: 1.55;
+    color: var(--muted);
+    margin: 8px 0 0;
+    text-wrap: pretty;
+  }
+  .step.done .step-title { color: color-mix(in oklab, var(--ink) 62%, var(--bg)); }
+
+  /* ── Підпункти ────────────────────────────────────────── */
+  .sublist {
+    margin: 18px 0 2px;
+    padding-left: 38px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-top: 1px solid var(--line);
+    padding-top: 18px;
+  }
+  .sub {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .sub-body { flex: 1; min-width: 0; padding-top: 1px; }
+  .sub-l {
+    font-size: calc(13px * var(--scale));
+    font-weight: 700;
+    color: var(--accent);
+    margin-right: 8px;
+  }
+  .sub-title {
+    font-size: calc(15px * var(--scale));
+    line-height: 1.32;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    margin: 0;
+    text-wrap: pretty;
+  }
+  .sub-desc {
+    font-size: calc(13px * var(--scale));
+    line-height: 1.5;
+    color: var(--muted);
+    margin: 4px 0 0;
+    text-wrap: pretty;
+  }
+  .sub.done .sub-title { color: color-mix(in oklab, var(--ink) 60%, var(--bg)); }
+
+  /* ── Чекбокс ──────────────────────────────────────────── */
+  .chk {
+    appearance: none;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1.8px solid color-mix(in oklab, var(--ink) 28%, var(--bg));
+    background: var(--bg);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  }
+  .chk-lg { width: 28px; height: 28px; border-radius: 9px; }
+  .chk-sm { width: 22px; height: 22px; border-radius: 7px; }
+  .chk svg {
+    width: 70%;
+    height: 70%;
+    stroke: var(--check-ink);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.15s, transform 0.18s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+  .chk:hover { border-color: var(--accent); }
+  .chk.is-on {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .chk.is-on svg { opacity: 1; transform: scale(1); }
+  .chk:active { transform: scale(0.92); }
+
+  /* ── Підвал ───────────────────────────────────────────── */
+  .foot {
+    margin-top: 44px;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: calc(12px * var(--scale));
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .foot-mark {
+    width: 7px; height: 7px;
+    border-radius: 2px;
+    background: var(--accent);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  /* ── Друк / PDF ───────────────────────────────────────── */
+  @page { margin: 14mm 12mm; }
+  @media print {
+    .root { background: #fff; }
+    .sheet { max-width: none; padding: 0; }
+    .reset { display: none !important; }
+    .step, .sub { break-inside: avoid; }
+    .step { box-shadow: none; }
+    .progress-fill, .chk, .chk.is-on, .progress-track, .step, .foot-mark {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .steps { gap: 10px; }
+    .title { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="checklist-data.js"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="app.jsx"></script>
+</body>
+</html>

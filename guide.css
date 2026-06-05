@@ -1,0 +1,589 @@
+/* ════════════════════════════════════════════════════════════════════
+   Інтерактивний гайд — повноекранна колода (паралакс + безкінечний скрол)
+   ════════════════════════════════════════════════════════════════════ */
+.guide {
+  --g-bg: #141109;
+  --g-ink: #F2ECDD;
+  --g-muted: #9D9784;
+  --g-surface: #211D13;
+  --g-surface-2: #2A2518;
+  --g-line: rgba(255, 255, 255, 0.1);
+  --dk-cause: var(--accent);
+  --dk-result: #4F9E84;
+  --dk-purpose: #5B92C7;
+  --dk-contrast: #C77E8C;
+
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--g-bg);
+  color: var(--g-ink);
+  font-family: var(--sans);
+  animation: guide-in 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+@keyframes guide-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Скролер із петлею ───────────────────────────────────── */
+.guide-scroller {
+  position: absolute;
+  inset: 0;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
+.guide-scroller::-webkit-scrollbar { display: none; }
+
+.gp-wrap {
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* ── Панель ──────────────────────────────────────────────── */
+.gp {
+  position: relative;
+  height: 100%;
+  display: flex;
+  overflow: hidden;
+}
+.gp-bg {
+  position: absolute;
+  top: 50%;
+  left: clamp(-20px, -2vw, 0px);
+  transform: translateY(-50%);
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: clamp(220px, 46vh, 560px);
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: #fff;
+  opacity: 0.04;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+  z-index: 0;
+}
+.gp-intro .gp-bg {
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--accent);
+  opacity: 0.07;
+}
+
+.gp-inner {
+  position: relative;
+  z-index: 1;
+  margin: auto;
+  width: 100%;
+  max-width: 1140px;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: clamp(78px, 11vh, 120px) clamp(22px, 5vw, 60px) clamp(70px, 9vh, 96px);
+  will-change: transform, opacity;
+}
+.gp-inner::-webkit-scrollbar { width: 6px; }
+.gp-inner::-webkit-scrollbar-thumb { background: var(--g-line); border-radius: 999px; }
+
+.gp-grid { display: block; }
+.gp-grid-2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(24px, 4vw, 52px);
+  align-items: start;
+}
+
+/* ── Заголовок панелі ────────────────────────────────────── */
+.gp-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.gp-kicker {
+  font-family: var(--mono);
+  font-size: calc(13px * var(--scale));
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.gp-sup {
+  font-family: var(--mono);
+  font-size: calc(11px * var(--scale));
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--g-muted);
+  background: var(--g-surface);
+  border: 1px solid var(--g-line);
+  padding: 4px 11px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.gp-title {
+  font-size: calc(clamp(30px, 5.6vw, 52px) * var(--scale));
+  line-height: 1.04;
+  font-weight: 800;
+  letter-spacing: -0.028em;
+  margin: 0 0 22px;
+  text-wrap: balance;
+}
+
+/* ── Текст / ключ / список ───────────────────────────────── */
+.gx-text {
+  font-size: calc(clamp(16px, 2.1vw, 19px) * var(--scale));
+  line-height: 1.62;
+  color: color-mix(in oklab, var(--g-ink) 86%, var(--g-bg));
+  margin: 0;
+  text-wrap: pretty;
+  max-width: 54ch;
+}
+.gx-key { margin: 20px 0 0; }
+.gx-key mark {
+  background: var(--hl);
+  color: #1A1813;
+  padding: 0.16em 0.34em;
+  border-radius: 4px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  font-size: calc(clamp(16px, 2.1vw, 19px) * var(--scale));
+  line-height: 2;
+  font-weight: 600;
+}
+.gx-note {
+  font-size: calc(14px * var(--scale));
+  line-height: 1.55;
+  color: var(--g-muted);
+  margin: 18px 0 0;
+  max-width: 52ch;
+}
+.gx-list-wrap { margin-top: 22px; }
+.gx-list-label {
+  font-family: var(--mono);
+  font-size: calc(11.5px * var(--scale));
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--g-muted);
+  margin-bottom: 12px;
+}
+.gx-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.gx-list li {
+  position: relative;
+  padding-left: 24px;
+  font-size: calc(15px * var(--scale));
+  line-height: 1.5;
+  color: color-mix(in oklab, var(--g-ink) 82%, var(--g-bg));
+  text-wrap: pretty;
+}
+.gx-list li::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0.55em;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: rotate(45deg);
+}
+.gx-list-tight li { font-size: calc(13.5px * var(--scale)); padding-left: 20px; }
+.gx-list-tight li::before { width: 5px; height: 5px; top: 0.5em; }
+
+/* ── Ресурси (брендовані картки) ─────────────────────────── */
+.gp-res { margin-top: 28px; }
+.gp-res-label {
+  font-family: var(--mono);
+  font-size: calc(11.5px * var(--scale));
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--g-muted);
+  margin-bottom: 12px;
+}
+.gp-res-list { display: flex; flex-direction: column; gap: 10px; }
+
+.res {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  background: var(--g-surface);
+  border: 1px solid var(--g-line);
+  border-radius: 13px;
+  padding: 12px 14px;
+  color: var(--g-ink);
+  transition: transform 0.16s, border-color 0.16s, background 0.16s;
+}
+.res:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--g-line));
+  background: var(--g-surface-2);
+}
+.res-logo { flex-shrink: 0; }
+.res-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: calc(15px * var(--scale));
+  letter-spacing: -0.01em;
+  padding: 9px 13px;
+  border-radius: 9px;
+  color: #fff;
+  line-height: 1;
+}
+.res-wm-logos { background: #11294C; font-family: var(--sans); }
+.res-wm-logos .res-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #4F9E84;
+  display: inline-block;
+}
+.res-wm-bibleby { background: #7C2D2D; font-family: var(--mono); font-weight: 600; }
+.res-wm-bibleby .res-by { opacity: 0.7; }
+.res-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.res-label {
+  font-size: calc(14px * var(--scale));
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.res-host {
+  font-family: var(--mono);
+  font-size: calc(11.5px * var(--scale));
+  color: var(--g-muted);
+}
+.res-arrow {
+  width: 18px; height: 18px;
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--g-muted);
+  transition: color 0.16s, transform 0.16s;
+}
+.res:hover .res-arrow { color: var(--accent); transform: translate(2px, -2px); }
+
+/* ── Підпункти у панелі ──────────────────────────────────── */
+.gp-heavy .gp-inner { padding-top: clamp(70px, 9vh, 96px); padding-bottom: clamp(60px, 7vh, 80px); }
+.gp-subgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+  gap: 12px;
+  margin-top: clamp(18px, 2.6vw, 26px);
+}
+.gp-subs { display: flex; flex-direction: column; gap: 12px; }
+.gp-sub {
+  background: var(--g-surface);
+  border: 1px solid var(--g-line);
+  border-radius: 13px;
+  padding: 15px 17px;
+}
+.gp-sub-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 7px;
+}
+.gp-sub-l {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--accent);
+  font-size: calc(13px * var(--scale));
+  flex-shrink: 0;
+}
+.gp-sub-title {
+  font-size: calc(15.5px * var(--scale));
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-wrap: pretty;
+}
+.gp-sub-text {
+  font-size: calc(13.5px * var(--scale));
+  line-height: 1.5;
+  color: color-mix(in oklab, var(--g-ink) 78%, var(--g-bg));
+  margin: 0;
+}
+.gp-sub .gx-list-tight { margin-top: 9px; }
+
+/* ── Блочна діаграма ─────────────────────────────────────── */
+.diag {
+  margin: 0 0 18px;
+  background: var(--g-surface);
+  border: 1px solid var(--g-line);
+  border-radius: 15px;
+  padding: clamp(16px, 2.4vw, 24px);
+}
+.diag-cap { display: flex; flex-direction: column; gap: 5px; margin-bottom: 16px; }
+.diag-ref {
+  font-family: var(--mono);
+  font-size: calc(12.5px * var(--scale));
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.diag-sub {
+  font-size: calc(12.5px * var(--scale));
+  line-height: 1.45;
+  color: var(--g-muted);
+}
+.diag-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-left: 2px dashed var(--g-line);
+  padding-left: 4px;
+  margin-bottom: 18px;
+}
+.diag-line {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin-left: calc(var(--ind) * clamp(18px, 2.4vw, 30px));
+}
+.diag-rail { display: none; }
+.diag-conn {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: calc(13px * var(--scale));
+  color: #fff;
+  padding: 3px 9px;
+  border-radius: 7px;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+.diag-conn-empty { background: transparent; min-width: 0; padding: 3px 0; }
+.diag-phrase {
+  font-size: calc(15px * var(--scale));
+  line-height: 1.4;
+  color: var(--g-ink);
+}
+.dk-cause .diag-conn, .diag-conn.dk-cause { background: var(--dk-cause); }
+.dk-result .diag-conn, .diag-conn.dk-result { background: var(--dk-result); }
+.dk-purpose .diag-conn, .diag-conn.dk-purpose { background: var(--dk-purpose); }
+.dk-contrast .diag-conn, .diag-conn.dk-contrast { background: var(--dk-contrast); }
+
+.diag-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding-top: 16px;
+  border-top: 1px solid var(--g-line);
+}
+.diag-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--mono);
+  font-size: calc(11.5px * var(--scale));
+  color: var(--g-muted);
+}
+.diag-swatch { width: 11px; height: 11px; border-radius: 3px; }
+.dk-cause .diag-swatch { background: var(--dk-cause); }
+.dk-result .diag-swatch { background: var(--dk-result); }
+.dk-purpose .diag-swatch { background: var(--dk-purpose); }
+.dk-contrast .diag-swatch { background: var(--dk-contrast); }
+
+.diag-plan { margin-top: 16px; }
+.diag-plan-label {
+  font-family: var(--mono);
+  font-size: calc(11.5px * var(--scale));
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--g-muted);
+  margin-bottom: 9px;
+}
+.diag-plan-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.diag-plan-list li {
+  font-size: calc(13.5px * var(--scale));
+  line-height: 1.45;
+  color: color-mix(in oklab, var(--g-ink) 80%, var(--g-bg));
+}
+
+/* ── Панель вступу ───────────────────────────────────────── */
+.gp-intro .gp-inner { max-width: 880px; text-align: left; }
+.gp-intro-title {
+  font-size: calc(clamp(26px, 4.6vw, 42px) * var(--scale));
+  line-height: 1.12;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0 0 22px;
+  text-wrap: balance;
+}
+.gp-intro-key { margin: 0 0 20px; }
+.gp-intro-note {
+  font-size: calc(15px * var(--scale));
+  line-height: 1.6;
+  color: var(--g-muted);
+  margin: 0;
+  max-width: 56ch;
+}
+.gp-scrollhint {
+  margin-top: 40px;
+  font-family: var(--mono);
+  font-size: calc(12.5px * var(--scale));
+  color: var(--g-muted);
+  animation: hint-bob 2.2s ease-in-out infinite;
+}
+@keyframes hint-bob {
+  0%, 100% { transform: translateY(0); opacity: 0.7; }
+  50% { transform: translateY(4px); opacity: 1; }
+}
+
+/* ── Верхня панель ───────────────────────────────────────── */
+.guide-top {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px clamp(18px, 4vw, 34px);
+  pointer-events: none;
+  background: linear-gradient(var(--g-bg), color-mix(in oklab, var(--g-bg) 30%, transparent));
+}
+.guide-id { display: flex; flex-direction: column; gap: 2px; min-width: 0; pointer-events: none; }
+.guide-id-n {
+  font-family: var(--mono);
+  font-size: calc(12px * var(--scale));
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+}
+.guide-id-t {
+  font-size: calc(14px * var(--scale));
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--g-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60vw;
+}
+.guide-close {
+  pointer-events: auto;
+  appearance: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--g-surface);
+  border: 1px solid var(--g-line);
+  color: var(--g-ink);
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: calc(13.5px * var(--scale));
+  padding: 9px 15px;
+  border-radius: 999px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.guide-close svg { width: 15px; height: 15px; }
+.guide-close:hover { background: var(--g-surface-2); border-color: color-mix(in oklab, var(--accent) 40%, var(--g-line)); }
+
+/* ── Бічна навігація (крапки) ────────────────────────────── */
+.guide-rail {
+  position: absolute;
+  top: 50%;
+  right: clamp(10px, 2vw, 22px);
+  transform: translateY(-50%);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+.rail-dot {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+  display: grid;
+  place-items: center;
+}
+.rail-tick {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background 0.18s, transform 0.18s, width 0.18s, height 0.18s, border-radius 0.18s;
+}
+.rail-dot:hover .rail-tick { background: rgba(255, 255, 255, 0.5); }
+.rail-dot.is-active .rail-tick {
+  background: var(--accent);
+  width: 10px;
+  height: 22px;
+  border-radius: 999px;
+}
+
+/* ── Стрілки ─────────────────────────────────────────────── */
+.guide-nav {
+  position: absolute;
+  bottom: clamp(16px, 3vh, 28px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 10px;
+}
+.gnav {
+  appearance: none;
+  cursor: pointer;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--g-surface);
+  border: 1px solid var(--g-line);
+  color: var(--g-ink);
+  transition: background 0.15s, transform 0.12s, border-color 0.15s;
+}
+.gnav svg { width: 22px; height: 22px; }
+.gnav:hover { background: var(--g-surface-2); border-color: color-mix(in oklab, var(--accent) 45%, var(--g-line)); }
+.gnav:active { transform: scale(0.93); }
+
+/* ── Адаптив ─────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .gp-grid-2 { grid-template-columns: 1fr; gap: 22px; }
+  .gp-title { margin-bottom: 16px; }
+}
+@media (max-width: 560px) {
+  .gp-inner { padding: 74px 20px 92px; }
+  .gp-bg { font-size: clamp(150px, 40vh, 300px); }
+  .guide-rail { display: none; }
+  .guide-id-t { display: none; }
+  .gx-text, .gx-key mark { font-size: calc(16px * var(--scale)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guide { animation: none; }
+  .gp-scrollhint { animation: none; }
+  .guide-scroller { scroll-behavior: auto; }
+  .gp-bg, .gp-inner { transition: none; }
+}
+
+/* ── Друк: гайд ніколи не друкується ─────────────────────── */
+@media print {
+  .guide { display: none !important; }
+}
