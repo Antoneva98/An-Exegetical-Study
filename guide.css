@@ -31,7 +31,7 @@
   position: absolute;
   inset: 0;
   overflow-y: scroll;
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: y proximity;
   scrollbar-width: none;
 }
 .guide-scroller::-webkit-scrollbar { display: none; }
@@ -39,7 +39,7 @@
 .gp-wrap {
   height: 100%;
   scroll-snap-align: start;
-  scroll-snap-stop: always;
+
 }
 
 /* ── Панель ──────────────────────────────────────────────── */
